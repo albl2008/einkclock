@@ -51,10 +51,10 @@ class ImageComposer7:
             # Draw features
             self.draw_date(context)
             self.draw_temps(context)
-            self.draw_column(context, self.weather.hourly_summary(0), 120, 30)
-            self.draw_column(context, self.weather.hourly_summary(2 * 3600), 120, 155)
-            self.draw_column(context, self.weather.hourly_summary(5 * 3600), 120, 280)
-            self.draw_column(context, self.weather.daily_summary(1), 120, 440)
+            self.draw_column(context, self.weather.daily_summary(1), 120, 30)
+            self.draw_column(context, self.weather.daily_summary(2), 120, 155)
+            self.draw_column(context, self.weather.daily_summary(3), 120, 280)
+            self.draw_column(context, self.weather.hourly_summary(0), 120, 440, True)
             #self.draw_meteogram(context)
             self.draw_current_hour(context)
             self.draw_alerts(context)
@@ -116,6 +116,8 @@ class ImageComposer7:
     def draw_temps(self, context: cairo.Context):
         # Draw on temperature ranges
         temp_min, temp_max = self.weather.temp_range_24hr()
+        
+        
         c_to_f = lambda c: (c * (9 / 5)) + 32
         # Draw background rects
         self.draw_roundrect(context, 335, 5, 85, 90, 5)
@@ -126,53 +128,56 @@ class ImageComposer7:
         context.fill()
         self.draw_text(
             context,
-            position=(377, 55),
-            text=round(temp_min),
+            position=(377, 37),
+            text="Min",
             color=WHITE,
             weight="bold",
-            size=50,
+            size=30,
             align="center",
         )
         self.draw_text(
             context,
             position=(377, 82),
-            text=round(c_to_f(temp_min)),
+            text=str(round(temp_min)) + "°C",
             color=WHITE,
-            size=23,
+            weight="bold",
+            size=30,
             align="center",
         )
         self.draw_text(
             context,
-            position=(465, 55),
-            text=round(self.weather.temp_current()),
+            position=(465, 37),
+            text="Now",
             color=BLACK,
             weight="bold",
-            size=50,
+            size=30,
             align="center",
         )
         self.draw_text(
             context,
             position=(465, 82),
-            text=round(c_to_f(self.weather.temp_current())),
+            text=str(round(self.weather.temp_current())) + "°C",
             color=BLACK,
-            size=23,
+            weight="bold",
+            size=30,
             align="center",
         )
         self.draw_text(
             context,
-            position=(553, 55),
-            text=round(temp_max),
+            position=(553, 37),
+            text="Max",
             color=WHITE,
             weight="bold",
-            size=50,
+            size=30,
             align="center",
         )
         self.draw_text(
             context,
             position=(553, 82),
-            text=round(c_to_f(temp_max)),
+            text=str(round(temp_max)) + "°C",
             color=WHITE,
-            size=23,
+            weight="bold",
+            size=30,
             align="center",
         )
 
@@ -289,7 +294,7 @@ class ImageComposer7:
                 context.set_source_rgb(*color)
                 context.fill()
 
-    def draw_column(self, context: cairo.Context, conditions, top, left):
+    def draw_column(self, context: cairo.Context, conditions, top, left, today=False):
         # Heading
         if "date" in conditions:
             time_text = (
@@ -308,6 +313,23 @@ class ImageComposer7:
             align="center",
         )
         self.draw_icon(context, conditions["icon"], (left, top + 33))
+        if today:
+            self.draw_text(
+                context,
+                text=conditions["description"],
+                position=(left + 120, top + 70),
+                color=BLACK,
+                size=18,
+                align="center",
+            )
+            self.draw_text(
+                context,
+                text=str(self.weather.humidity_current()) + "%",
+                position=(left + 120, top + 90),
+                color=BLACK,
+                size=18,
+                align="center",
+            )
 
     def draw_alerts(self, context: cairo.Context):
         # Load weather alerts
@@ -511,7 +533,7 @@ class ImageComposer7:
         context.paint()
         context.restore()
 
-    def draw_current_hour(self, context):
+    def draw_current_hour(self, context: cairo.Context):
         top = 310
         left = 10
         width = 425
@@ -528,22 +550,48 @@ class ImageComposer7:
 
         # Define position for the large text (centered in the metogram space)
         position_x = left + (graph_width / 2)  # Horizontally centered
-        position_y = top + (height / 2)  # Vertically centered
+        position_y = top + (height / 2) - 10  # Vertically centered
 
         # Draw the large "HH:MM" string on the metogram space
         self.draw_text(
             context,
             text=large_time_str,
-            position=(position_x, position_y),
+            position=(position_x, position_y- 6),
             size=85,  # Use a large font size, adjust as needed
             color=BLACK,
             align="center",  # Align the text in the center horizontally
             valign="middle"  # Align the text in the center vertically
         )
-        self.print_resume(context)
-        self.print_resume2(context)
+        
+        self.print_tomorrow_badget(context, position_x, position_y, graph_width, height)
+            
+            
+        
     
-    def print_resume(self, context):
+    def print_tomorrow_badget(self, context: cairo.Context, position_x, position_y, graph_width, height):
+        self.draw_roundrect(context, position_x - 200, position_y + 43, graph_width + 15 , height - 25, 5)
+        context.set_source_rgb(*ORANGE)
+        context.fill()
+        dt = datetime.datetime.fromisoformat(str(self.weather.daily_summary(1)["date"]))
+
+
+        day_name = dt.strftime("%A")
+        print(day_name)
+        self.draw_text(
+            context,
+            text=day_name,
+            position=(position_x, position_y + 50),
+            size=18,
+            color=BLACK,
+            weight="bold",
+            align="center",  # Align the text in the center horizontally
+            valign="middle"  # Align the text in the center vertically
+        )
+        self.print_tomorrow_resume(context)
+        
+        self.print_tomorrow_temps(context)
+
+    def print_tomorrow_resume(self, context):
         bottom = 410
         left = 10
         width = 425
@@ -553,14 +601,15 @@ class ImageComposer7:
 
         self.draw_text(
             context,
-            text=f"Tomorrow: {self.weather.data['daily'][1]['summary']}",
+            text=f"{self.weather.data['daily'][1]['summary'] if len(self.weather.data['daily'][1]['summary']) <= 62 else str(self.weather.data['daily'][1]['summary'][:53]) + '...'}",
             position=(left + (graph_width / 2), bottom + (height / 8)),
             size=15,
             color=BLACK,
+            
             align="center",  # Align the text in the center horizontally
             valign="middle"  # Align the text in the center vertically
         )
-    def print_resume2(self, context):
+    def print_tomorrow_temps(self, context):
         bottom = 430
         left = 10
         width = 425
@@ -571,9 +620,10 @@ class ImageComposer7:
         self.draw_text(
             context,
             text=f"{self.weather.data['daily'][1]['temp']['min']:.1f} °C - {self.weather.data['daily'][1]['temp']['max']:.1f} °C",
-            position=(left + (graph_width / 2), bottom + (height / 8)),
-            size=15,
-            color=ORANGE,
+            position=(left + (graph_width / 2), bottom + (height / 8) + 2),
+            size=18,
+            color=WHITE,
+            weight="bold",
             align="center",  # Align the text in the center horizontally
             valign="middle"  # Align the text in the center vertically
         )
