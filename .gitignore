@@ -104,4 +104,4 @@ venv.bak/
 # Static and media files (if they are generated, not stored in repo)
 static/
 media/
-images/
+
