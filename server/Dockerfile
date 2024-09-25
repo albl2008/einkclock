@@ -15,11 +15,12 @@ RUN apk update && apk add \
 # Codebase setup
 RUN mkdir /srv/weatherboard/
 WORKDIR /srv/weatherboard/
-RUN pip3 install requests pillow flask gunicorn pytz pycairo openai dotenv numpy
+RUN pip3 install requests pillow flask gunicorn pytz pycairo openai python-dotenv numpy
 
 # Add code
-ENV PYTHONPATH /srv/weatherboard/server/
+ENV PYTHONPATH /srv/weatherboard/server
 ADD . /srv/weatherboard/
+COPY .env /srv/weatherboard/.env
 
 # Add fonts
 RUN mkdir /usr/share/fonts && cp /srv/weatherboard/fonts/Roboto* /usr/share/fonts && fc-cache

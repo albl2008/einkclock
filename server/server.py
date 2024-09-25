@@ -4,9 +4,7 @@ from flask import Flask, Response, redirect, send_file, request, url_for
 
 from composer_2 import ImageComposer2
 from composer_7 import ImageComposer7
-import sys
-sys.path.append('../server-images') 
-from main import generate_image
+from server_images.main import generate_image
 import time
 from dotenv import load_dotenv
 import os
@@ -58,7 +56,7 @@ def random_image():
     generate_image(final)
 
     # Create a response with the image and set the appropriate headers
-    response = send_file("../server-images/images/image-converted.png", mimetype="image/png")
+    response = send_file("server_images/images/image-converted.png", mimetype="image/png")
     response.headers['Refresh'] = '95; url=%s' % url_for('index', api_key=weahter_api_key, style="7", latitude="-32.89084", longitude="-68.82717", timezone="America/Argentina/Mendoza")
 
 

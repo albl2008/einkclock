@@ -7,7 +7,7 @@ from PIL import Image
 from dotenv import load_dotenv
 import os
 import numpy as np
-import prompts as prompts
+
 
 load_dotenv()
 
@@ -68,7 +68,7 @@ def generate_image(prompt):
     #img.show()
 
     #random_number = np.random.randint(1000, 2000)
-    img.save(f"../server-images/images/imagegen.png")
+    img.save(f"server_images/images/imagegen.png")
     #img.save(f"images/imagegen-{random_number}.jpg")
 
     
@@ -88,7 +88,7 @@ def resize_and_convert(image, width=600, height=448):
 
     #random_number = np.random.randint(1000, 2000)
     # Save the image
-    image_reduced.save(f"../server-images/images/image-converted.png")
+    image_reduced.save(f"server_images/images/image-converted.png")
 
     return 
 
