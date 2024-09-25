@@ -17,7 +17,7 @@ class WeatherClient:
         self.data = requests.get(
             f"https://api.openweathermap.org/data/3.0/onecall?lat={self.latitude}&lon={self.longitude}&exclude=minutely&units=metric&appid={api_key}"
         ).json()
-        print(self.data)
+        #print(self.data)
         
         
 

@@ -32,6 +32,6 @@ holidays = {
 
     # cumpleaños
     datetime.date(year, 9, 24): "CF FC Bata   ",
-    datetime.date(year, 10, 26): "FERIADO 1",
-    datetime.date(year, 10, 27): "FERIADO 2",
+    datetime.date(year, 9, 26): "Alerta 1",
+    datetime.date(year, 9, 27): "FERIADO ",
 }

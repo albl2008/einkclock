@@ -51,12 +51,12 @@ class ImageComposer7:
             # Draw features
             self.draw_date(context)
             self.draw_temps(context)
-            self.draw_column(context, self.weather.daily_summary(1), 120, 30)
-            self.draw_column(context, self.weather.daily_summary(2), 120, 155)
-            self.draw_column(context, self.weather.daily_summary(3), 120, 280)
-            self.draw_column(context, self.weather.hourly_summary(0), 120, 440, True)
-            #self.draw_meteogram(context)
-            self.draw_current_hour(context)
+            self.draw_column(context, self.weather.daily_summary(1), 120, 215) 
+            self.draw_column(context, self.weather.daily_summary(2), 120, 342) 
+            self.draw_column(context, self.weather.daily_summary(3), 120, 470) 
+            self.draw_column(context, self.weather.hourly_summary(0), 120, 30, True) 
+            self.draw_meteogram(context)
+            #self.draw_current_hour(context)
             self.draw_alerts(context)
             self.draw_stats(context)
             # Save out as bytestream
@@ -182,10 +182,10 @@ class ImageComposer7:
         )
 
     def draw_meteogram(self, context: cairo.Context):
-        top = 310
-        left = 10
+        top = 300
+        left = 165
         width = 425
-        height = 85
+        height = 50
         left_axis = 18
         hours = 24
         y_interval = 10
@@ -296,10 +296,21 @@ class ImageComposer7:
 
     def draw_column(self, context: cairo.Context, conditions, top, left, today=False):
         # Heading
+        th = ""
         if "date" in conditions:
             time_text = (
-                conditions["date"].astimezone(self.timezone).strftime("%A").title()
+                conditions["date"].astimezone(self.timezone).strftime("%d").lstrip("0")
             )
+            th = {
+            "01": "st",
+            "02": "nd",
+            "03": "rd",
+            "21": "st",
+            "22": "nd",
+            "23": "rd",
+            "31": "st",
+        }.get(conditions["date"].astimezone(self.timezone).strftime("%d"), "th")
+        
         else:
             time_text = (
                 conditions["time"].astimezone(self.timezone).strftime("%-I%p").lower()
@@ -307,28 +318,59 @@ class ImageComposer7:
         self.draw_text(
             context,
             text=time_text,
-            position=(left + 50, top + 25),
+            position=(left + 50, top + 5),
             color=BLACK,
             size=28,
             align="center",
         )
-        self.draw_icon(context, conditions["icon"], (left, top + 33))
-        if today:
+        
+        self.draw_text(
+            context,
+            text=th,
+            position=(left+66, top - 10),
+            size=15,
+            color=BLACK,
+            weight="bold",
+        )
+        self.draw_icon(context, conditions["icon"], (left, top + 13))
+        if not today:
+            self.draw_roundrect(context, left + 10, top + 115, 85, 50, 5)
+            context.set_source_rgb(*ORANGE)
+            context.fill()
             self.draw_text(
                 context,
-                text=conditions["description"],
-                position=(left + 120, top + 70),
+                text=str(round(conditions["temperature_range"][0])) + "°C",
+                position=(left + 50, top + 133),
                 color=BLACK,
+                weight="bold",
                 size=18,
                 align="center",
             )
             self.draw_text(
                 context,
-                text=str(self.weather.humidity_current()) + "%",
-                position=(left + 120, top + 90),
+                text=str(round(conditions["temperature_range"][1])) + "°C",
+                position=(left + 50, top + 160),
+                color=BLACK,
+                weight="bold",
+                size=18,
+                align="center",
+            )
+        else:
+            new_left =self.draw_text(
+               context,
+              text=conditions["description"],
+             position=(left + 30, top + 123),
                 color=BLACK,
                 size=18,
                 align="center",
+            )
+            self.draw_text(
+               context,
+              text=str(self.weather.humidity_current()) + "%",
+              position=(left + new_left + 30, top + 123),
+              color=BLACK,
+              size=18,
+              align="center",
             )
 
     def draw_alerts(self, context: cairo.Context):
@@ -358,7 +400,7 @@ class ImageComposer7:
         # Add no alert pill if there weren't any
         if not alerts:
             alerts = [{"text": "Nothing", "color": BLACK}]
-        top = 265
+        top = 410
         left = 5
         for alert in alerts:
             text = alert["text"].upper()
@@ -414,17 +456,17 @@ class ImageComposer7:
 
     def draw_stats(self, context: cairo.Context):
         # Draw sunrise, sunset, AQI icon and values
-        self.draw_icon(context, "rise-set-aqi", (450, 300))
+        self.draw_icon(context, "rise-set-aqi", (12, 255))
         self.draw_text(
             context,
-            position=(505, 337),
+            position=(68, 292),
             text=self.weather.sunrise().astimezone(self.timezone).strftime("%H:%M"),
             color=BLACK,
             size=32,
         )
         self.draw_text(
             context,
-            position=(505, 385),
+            position=(68, 340),
             text=self.weather.sunset().astimezone(self.timezone).strftime("%H:%M"),
             color=BLACK,
             size=32,
@@ -438,11 +480,11 @@ class ImageComposer7:
         else:
             color = RED
         text_width = self.draw_text(context, aqi, size=30, weight="bold", noop=True)
-        self.draw_roundrect(context, 505, 402, text_width + 13, 36, 3)
+        self.draw_roundrect(context, 71, 359, text_width + 13, 36, 3)
         context.set_source_rgb(*color)
         context.fill()
         self.draw_text(
-            context, position=(510, 430), text=aqi, color=WHITE, size=30, weight="bold"
+            context, position=(75, 387), text=aqi, color=WHITE, size=30, weight="bold"
         )
 
     def draw_roundrect(self, context, x, y, width, height, r):
