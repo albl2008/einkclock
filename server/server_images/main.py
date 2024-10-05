@@ -65,11 +65,9 @@ def generate_image(prompt):
     image_data = requests.get(image_url).content
     img = Image.open(BytesIO(image_data))
 
-    #img.show()
-
-    #random_number = np.random.randint(1000, 2000)
+    
     img.save(f"server_images/images/imagegen.png")
-    #img.save(f"images/imagegen-{random_number}.jpg")
+    
 
     
 

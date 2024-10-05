@@ -1,0 +1,1 @@
+*/1 * * * * cd /srv/weatherboard && python3 check_weather.py >> /var/log/cron.log 2>&1
