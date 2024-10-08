@@ -1,7 +1,8 @@
 import hashlib
+import io
 import os
 import time
-
+import requests
 from PIL import Image
 
 #from display.waveshare_epd import epd5in83bc
@@ -51,13 +52,30 @@ def check_file_change(file_path):
         log_message(f"Sin cambios CLIMA! {file_path}.")
 
 def send_to_epd():
-    fiepath = "server_images/images/image-converted.png"
-    image = Image.open(fiepath)
-    log_message("Sending to EPD")
-    #show_image(image)
+    filepath = "server_images/images/weather.png"
 
+    try:
+        # Open the image file
+        with open(filepath, 'rb') as image_file:
+            # Define the URL of your Flask app (replace with your actual URL)
+            url = "http://192.168.100.179:5005/weather"
+
+            # Send POST request with image file
+            files = {'image': image_file}
+            response = requests.post(url, files=files)
+
+            # Check for successful response
+            if response.status_code == 200:
+                log_message("Image sent successfully!")
+            else:
+                log_message(f"Error sending image: {response.status_code} - {response.text}")
+
+    except FileNotFoundError:
+        log_message(f"Error: Image file '{filepath}' not found.")
+
+    except Exception as e:
+        log_message(f"Unexpected error sending image: {e}")
     
-
 
 # Example usage
 image_path = "server_images/images/weather.png"

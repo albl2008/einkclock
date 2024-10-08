@@ -1,7 +1,9 @@
 import hashlib
+import io
 import os
 import time
 from PIL import Image
+import requests
 
 #from display.waveshare_epd import epd5in83bc
 #from display.show import show_image
@@ -51,14 +53,29 @@ def check_file_change(file_path):
         log_message(f"Sin cambios AI Art!{file_path}.")
 
 def send_to_epd():
-    fiepath = "server_images/images/image-converted.png"
-    image = Image.open(fiepath)
-    log_message("Sending to EPD")
-    #show_image(image)
+    filepath = "server_images/images/image-converted.png"
 
-    
+    try:
+        # Open the image file
+        with open(filepath, 'rb') as image_file:
+            # Define the URL of your Flask app (replace with your actual URL)
+            url = "http://192.168.100.179:5005/image"
 
+            # Send POST request with image file
+            files = {'image': image_file}
+            response = requests.post(url, files=files)
 
+            # Check for successful response
+            if response.status_code == 200:
+                log_message("Image sent successfully!")
+            else:
+                log_message(f"Error sending image: {response.status_code} - {response.text}")
+
+    except FileNotFoundError:
+        log_message(f"Error: Image file '{filepath}' not found.")
+
+    except Exception as e:
+        log_message(f"Unexpected error sending image: {e}")
 
 
 
