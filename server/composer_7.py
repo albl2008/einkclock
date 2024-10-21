@@ -390,7 +390,7 @@ class ImageComposer7:
                     {
                         "text": holiday_name[:10]+"..." if len(holiday_name)>13 else holiday_name,
                         "subtext": (
-                            "%id" % days_until if days_until != 1 else "tomorrow"
+                            "%id" % days_until if days_until != 1 else "m  "
                         ),
                         "color": BLUE,
                     }
@@ -448,7 +448,7 @@ class ImageComposer7:
                     position=(left + 8, top + 22),
                     size=15,
                     color=WHITE,
-                )
+                ) + len(alert["subtext"])
                 left += subtext_width + 10
             else:
                 subtext_width = 0

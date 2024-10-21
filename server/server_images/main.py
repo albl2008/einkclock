@@ -17,16 +17,16 @@ print("API KEY: " + os.getenv("OPENAI_API_KEY"))
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+# Palette colors for the 7 colors supported by the panel#
+
 PALETTE = [
-    (0, 0, 0),        # BLACK
-    (255, 255, 255),  # WHITE
-    (0, 255, 0),      # GREEN
-    (0, 0, 255),      # BLUE
-    (255, 0, 0),      # RED
-    (255, 255, 0),    # YELLOW
-    (128, 0, 255),    # PURPLE
-    (255, 140, 0),    # ORANGE
-    (102, 102, 102)   # GREY
+    (0, 0, 0),         # Black
+    (255, 255, 255),   # White
+    (0, 255, 0),       # Green
+    (0, 0, 255),       # Blue
+    (255, 0, 0),       # Red
+    (255, 255, 0),     # Yellow
+    (255, 128, 0),     # Orange
 ]
 
 def find_closest_color(pixel, palette):
@@ -49,13 +49,12 @@ def convert_image_to_palette(image, palette):
             closest_color = find_closest_color(original_pixel, palette)
             pixels[x, y] = closest_color
     
-    palette_image.show()
-
     return palette_image
 
 
 def generate_image(prompt):
-    response = client.images.generate(prompt=prompt,
+    mandatory = "The image generated will be printed in 7 colour ACeP display, so please generate an image considering this. Think on styles like pop art, or single line drawings or something in bold colours and well defined. One image about: "
+    response = client.images.generate(prompt=mandatory + ' ' + prompt,
     n=1,
     model="dall-e-3",
     size="1024x1024")
@@ -79,16 +78,12 @@ def resize_and_convert(image, width=600, height=448):
     # Resize the image to the display size
     image_resized = image.resize((width, height))
 
-    # Convert to a limited palette (7 colors)
-    image_reduced = image_resized.convert('P', palette=PALETTE, colors=7)
+    # Convert the image to the 7-color palette
+    image_converted = convert_image_to_palette(image_resized, PALETTE)
 
-    
-
-    #random_number = np.random.randint(1000, 2000)
     # Save the image
-    image_reduced.save(f"server_images/images/image-converted.png")
+    image_converted.save(f"server_images/images/image-converted.png")
 
-    return 
-
+    return
 
 
