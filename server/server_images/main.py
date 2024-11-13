@@ -52,9 +52,9 @@ def convert_image_to_palette(image, palette):
     return palette_image
 
 
-def generate_image(prompt):
+async def generate_image(prompt):
     mandatory = "The image generated will be printed in 7 colour ACeP display, so please generate an image considering this. Think on styles like pop art, or single line drawings or something in bold colours and well defined. One image about: "
-    response = client.images.generate(prompt=mandatory + ' ' + prompt,
+    response = await client.images.generate(prompt=mandatory + ' ' + prompt,
     n=1,
     model="dall-e-3",
     size="1024x1024")

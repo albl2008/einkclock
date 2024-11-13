@@ -60,12 +60,12 @@ def weather_image():
     return send_file(path, mimetype="image/png")
 
 @app.route("/random_image/")
-def random_image():
+async def random_image():
     prompt = request.args.get("prompt", "a random image")
-    generate_image(prompt)
+    await generate_image(prompt)
     
     path = "server_images/images/imagegen.png"
-    return send_file(path, mimetype="image/png")
+    return 'Image saved' + path
 
 
 
