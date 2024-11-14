@@ -48,8 +48,8 @@ def check_file_change(file_path):
     if current_hash != last_hash:
         log_message(f"------------------- {file_path} SE GENERO IMAGEN! -------------------")
         send_to_epd()
-        save_image()
         store_current_hash(current_hash)  # Update the stored hash
+        save_image()
     else:
         log_message(f"Sin cambios AI Art!{file_path}.")
 
