@@ -1,11 +1,13 @@
+import datetime
 from io import BytesIO
 
 from flask import Flask, Response, redirect, send_file, request, url_for
+import requests
 
 from composer_2 import ImageComposer2
 from PIL import Image
 from composer_7 import ImageComposer7
-from server_images.main import generate_image
+from server_images.main import generate_image, get_apod
 import time
 from dotenv import load_dotenv
 import os
@@ -48,6 +50,14 @@ def index():
     return send_file(output, mimetype="image/png")
 
 
+@app.route("/feriados")
+def feriados():
+    current_year = datetime.datetime.now().year
+    url = f'https://api.argentinadatos.com/v1/feriados/{current_year}'
+    response = requests.get(url)
+    return response.json()
+
+
 @app.route("/image")
 def image():
     path = "server_images/images/image-converted.png"
@@ -57,6 +67,17 @@ def image():
 @app.route("/weather_image")
 def weather_image():
     path = "server_images/images/weather.png"
+    return send_file(path, mimetype="image/png")
+
+@app.route("/apod")
+def apod():
+    explanation = get_apod()
+    return explanation
+
+
+@app.route("/apod_image")
+def apod_image():
+    path = "server_images/images/apodimage.png"
     return send_file(path, mimetype="image/png")
 
 @app.route("/random_image/")

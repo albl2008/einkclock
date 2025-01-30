@@ -13,6 +13,7 @@ load_dotenv()
 
 
 print("API KEY: " + os.getenv("OPENAI_API_KEY"))
+print("NASA_API_KEY: " + os.getenv("NASA_API_KEY"))
 
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -73,6 +74,39 @@ def generate_image(prompt):
     resize_and_convert(img)
 
     return
+
+def get_apod():
+    api_key = os.getenv("NASA_API_KEY")
+    # Make the request to NASA's APOD API
+    response = requests.get(f"https://api.nasa.gov/planetary/apod?api_key={api_key}")
+    
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        data = response.json()
+        
+        # Access the explanation and image URL
+        try:
+            explanation = data["explanation"]
+            image_url = data["url"]
+            
+            # Download the image data
+            image_data = requests.get(image_url).content
+            
+            # Process and save the image (optional)
+            if data["media_type"] == "image":
+                img = Image.open(BytesIO(image_data))
+                img.save(f"server_images/images/apodimage.png")
+                resize_and_convert(img)
+
+            return explanation  # Return the explanation text
+            
+        except KeyError as e:
+            print(f"KeyError: {e}. Data might not contain expected keys.")
+            return "Error: Missing expected key in the API response."
+
+    else:
+        print(f"Failed to fetch APOD data. Status code: {response.status_code}")
+        return f"Error: API request failed with status code {response.status_code}"
 
 def resize_and_convert(image, width=600, height=448):
     # Resize the image to the display size

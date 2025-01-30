@@ -1,6 +1,16 @@
 import datetime
+import requests
 
 year = datetime.datetime.now().year
+
+url = 'https://api.argentinadatos.com/v1/feriados/{year}'
+
+response = requests.get(url)
+
+if response.status_code == 200:
+    print(response.json())
+
+
 
 holidays = {
     datetime.date(year, 1, 1): "Año Nuevo",
