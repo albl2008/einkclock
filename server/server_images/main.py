@@ -95,7 +95,7 @@ def get_apod():
             # Process and save the image (optional)
             if data["media_type"] == "image":
                 img = Image.open(BytesIO(image_data))
-                img.save(f"server_images/images/apodimage.png")
+                img.save(f"server_images/images/imagegen.png")
                 resize_and_convert(img)
 
             return explanation  # Return the explanation text
