@@ -26,20 +26,20 @@ COPY .env /srv/weatherboard/.env
 # Add fonts
 RUN mkdir /usr/share/fonts && cp /srv/weatherboard/fonts/Roboto* /usr/share/fonts && fc-cache
 
-# # Copy crontab and install it
-# COPY crontab /etc/cron.d/weatherauto
-# COPY cronimage /etc/cron.d/cronimage
-# COPY cronweather /srv/cron.d/cronupdateweather
-# RUN chmod 0644 /etc/cron.d/weatherauto
-# RUN chmod 0644 /etc/cron.d/cronimage
-# RUN chmod 0644 /srv/cron.d/cronupdateweather
+# Copy crontab and install it
+COPY crontab /etc/cron.d/weatherauto
+COPY cronimage /etc/cron.d/cronimage
+COPY cronweather /srv/cron.d/cronupdateweather
+RUN chmod 0644 /etc/cron.d/weatherauto
+RUN chmod 0644 /etc/cron.d/cronimage
+RUN chmod 0644 /srv/cron.d/cronupdateweather
 
-# # Ensure the cron job is registered for root user
-# RUN crontab /etc/cron.d/weatherauto
-# RUN crontab /etc/cron.d/cronimage
-# RUN crontab /srv/cron.d/cronupdateweather
-# # Create the log file to be able to run tail later
-# RUN touch /var/log/cron.log
+# Ensure the cron job is registered for root user
+RUN crontab /etc/cron.d/weatherauto
+RUN crontab /etc/cron.d/cronimage
+RUN crontab /srv/cron.d/cronupdateweather
+# Create the log file to be able to run tail later
+RUN touch /var/log/cron.log
 
 # Runtime
 ENV PORT 8080
